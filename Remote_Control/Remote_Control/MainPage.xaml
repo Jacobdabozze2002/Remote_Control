@@ -6,36 +6,15 @@
 
     
     <StackLayout VerticalOptions="Center">
-        <Label  x:Name="lbConnect"
-                Text="Not Connected"
-                HorizontalOptions="Center"
-                FontSize="Title"
-                TextColor="White"
-                Margin="10"/>
-        <Button x:Name="btn1"   
-                Text="LED 1 Off"
-                Clicked="request_status_change"
-                FontSize="Large"
-                BackgroundColor="White"
-                Margin="10"/>
-        <Button x:Name="btn2"   
-                Text="LED 2 Off"
-                Clicked="request_status_change"
-                FontSize="Large"
-                BackgroundColor="White"
-                Margin="10"/>
-        <Button x:Name="btn3"   
-                Text="LED 3 Off"
-                Clicked="request_status_change"
-                FontSize="Large"
-                BackgroundColor="White"
-                Margin="10"/>
-        <Button x:Name="btn4"   
-                Text="LED 4 Off"
-                Clicked="request_status_change"
-                FontSize="Large"
-                BackgroundColor="White"
-                Margin="10"/>
+        <Button x:Name="open_LED_control"   
+            Text="LED Control"
+            Clicked="open_LED_control_Clicked"
+            FontSize="Large"
+            BackgroundColor="White"
+            Margin="10"
+            CornerRadius="10"/>
+        
     </StackLayout>
+
 
 </ContentPage>
