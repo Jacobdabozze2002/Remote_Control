@@ -9,7 +9,7 @@ using System.Text;
 namespace Remote_Control
 {
     public partial class MainPage : ContentPage
-    {   
+    {
         public MainPage()
         {
             InitializeComponent();
@@ -17,8 +17,11 @@ namespace Remote_Control
 
         private async void open_LED_control_Clicked(object sender, EventArgs e)
         {
+            App.IS_PAGE_OPEN = true;
             await Navigation.PushAsync(new LED_control());
         }
+
+
     }
 }
 

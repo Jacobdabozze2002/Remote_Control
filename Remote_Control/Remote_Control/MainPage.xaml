@@ -5,15 +5,22 @@
              BackgroundColor="black">
 
     
-    <StackLayout VerticalOptions="Center">
-        <Button x:Name="open_LED_control"   
-            Text="LED Control"
+    <StackLayout>
+        <Label
+            Margin="50"
+            Text="Remote Controls"
+            FontSize="Title"
+            TextColor="White"
+            HorizontalOptions="Center"/>
+
+        <Button 
+            x:Name="open_LED_control"   
+            Text="LPC1768"
             Clicked="open_LED_control_Clicked"
             FontSize="Large"
             BackgroundColor="White"
             Margin="10"
             CornerRadius="10"/>
-        
     </StackLayout>
 
 

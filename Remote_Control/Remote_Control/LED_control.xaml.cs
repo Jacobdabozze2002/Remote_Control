@@ -18,16 +18,6 @@ namespace Remote_Control
     public partial class LED_control : ContentPage
     {
         private Button[] buttons;
-
-        private const int PORT = 80;
-        private const int TIMEOUT = 500;
-        private const string SERVER_IP = "192.168.0.100";
-
-        /*
-         für mehrere Seiten public machen
-         bei Seiten-Start zurücksetzen und buttons neu initialisieren
-         send_on_button_request() anpassen 
-        */
         private string[] commands_buttons = { null, null, null, null };
 
         public LED_control()
@@ -36,57 +26,34 @@ namespace Remote_Control
 
             buttons = new Button[] { btn1, btn2, btn3, btn4 };
 
-            scheduler();
-        }
 
-        private async void scheduler()
-        {
-            bool has_network_access;
-            bool has_connection;
-            bool was_connected = false;
-            enable_buttons(false);
-
-            while (true)
+            // Connection Events
+            App.onEveryRun = () =>
             {
-                // check connection status
-                has_network_access = Connectivity.NetworkAccess == NetworkAccess.Internet;
-                has_connection = has_network_access && send_code("XXXX") == "YYYY";
+                lbConnect.Text = App.HAS_NETWORK_ACCESS ? (App.HAS_CONNECTION ? "Connected" : "Connecting ...") : "Disconnected";
+            };
 
-                // set text of lbConnected
-                lbConnect.Text = has_network_access ? (has_connection ? "Connected" : "Connecting ...") : "Disconnected";
+            App.onNewConnection = () =>
+            {
+                _ = read_button_status();
+                enable_buttons(true);
+            };
 
-                // new connection
-                if (has_connection && !was_connected)
-                {
-                    _ = read_button_status();
-                    enable_buttons(true);
-                    was_connected = true;
-                }
+            App.onNewDisconnection = () =>
+            {
+                reset_buttons();
+                enable_buttons(false);
+            };
 
-                // new disconnection
-                if (!has_connection && was_connected)
-                {
-                    reset_buttons();
-                    enable_buttons(false);
-                    was_connected = false;
-                }
+            App.onWhileConnected = () =>
+            {
+                _ = send_one_button_request();
+            };
 
-                // while connected
-                if (has_connection)
-                {
-                    _ = send_one_button_request();
-                }
-
-                // while disconnected
-                if (!has_connection)
-                {
-
-                }
-
-                // short delay
-                await Task.Delay(250);
-            }
-
+            App.onWhileDisconnected = () =>
+            {
+                enable_buttons(false);
+            };
         }
 
         private async void request_status_change(object sender, EventArgs e)
@@ -109,7 +76,7 @@ namespace Remote_Control
             {
                 if (commands_buttons[i] != null)
                 {
-                    string answer = send_code(commands_buttons[i]);
+                    string answer = App.send_code(commands_buttons[i]);
                     commands_buttons[i] = null;
                     enable_buttons(true);
 
@@ -131,7 +98,7 @@ namespace Remote_Control
 
             for (int i = 0; i < buttons.Length; ++i)
             {
-                answer = send_code("000" + (i * 2));
+                answer = App.send_code("000" + (i * 2));
 
                 if (answer == "On" || answer == "Off") status[i] = answer;
                 else return false;
@@ -139,48 +106,6 @@ namespace Remote_Control
 
             for (int i = 0; i < buttons.Length; ++i) buttons[i].Text = "LED " + i + " " + status[i];
             return true;
-        }
-
-        private string send_code(string action_id)
-        {
-            string answer = null;
-
-            try
-            {
-                IPAddress ip = IPAddress.Parse(SERVER_IP);
-                EndPoint endPoint = new IPEndPoint(ip, PORT);
-                Socket socket = new Socket(ip.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
-                socket.ReceiveTimeout = TIMEOUT;
-                socket.SendTimeout = TIMEOUT;
-
-                Task connect = socket.ConnectAsync(endPoint);
-                if (connect.Wait(TIMEOUT))
-                {
-                    byte[] message_sent = Encoding.ASCII.GetBytes(action_id);
-                    int bytes_sent = socket.Send(message_sent);
-
-                    byte[] message_received = new byte[4];
-                    int bytes_received = socket.Receive(message_received);
-
-                    answer = Encoding.ASCII.GetString(message_received, 0, 4);
-                }
-
-                socket.Close();
-
-                return simplify(answer);
-            }
-            catch (Exception)
-            {
-                return answer;
-            }
-        }
-
-        private string simplify(string answer)
-        {
-            if (answer == "__ON") return "On";
-            if (answer == "_OFF") return "Off";
-
-            return answer;
         }
 
         private void reset_buttons() { for (int i = 0; i < buttons.Length; ++i) buttons[i].Text = "LED " + i + " Off"; }

@@ -9,8 +9,6 @@
             <Label  x:Name="lbConnect"
                 Text="Disconnected"
                 HorizontalOptions="Center"
-                AnchorX="0"
-                AnchorY="0"
                 FontSize="Title"
                 TextColor="White"
                 Margin="10"/>
