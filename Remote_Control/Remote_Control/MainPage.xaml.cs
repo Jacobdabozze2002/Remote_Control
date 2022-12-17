@@ -1,10 +1,7 @@
 ﻿using System;
 using Xamarin.Forms;
-using Xamarin.Essentials;
 using System.Threading.Tasks;
-using System.Net.Sockets;
-using System.Net;
-using System.Text;
+
 
 namespace Remote_Control
 {
@@ -15,10 +12,21 @@ namespace Remote_Control
             InitializeComponent();
         }
 
-        private async void open_LED_control_Clicked(object sender, EventArgs e)
+        private async void navigate_to(Page page, bool start_scheduler = true)
         {
-            App.IS_PAGE_OPEN = true;
-            await Navigation.PushAsync(new LED_control());
+            await Navigation.PushAsync(page);
+
+            if (start_scheduler)
+            {
+                await Task.Delay(250);
+                App.IS_PAGE_OPEN = true;
+                App.scheduler();
+            }
+        }
+
+        private void open_LED_control_Clicked(object sender, EventArgs e)
+        {
+            navigate_to(new LED_control());
         }
 
 

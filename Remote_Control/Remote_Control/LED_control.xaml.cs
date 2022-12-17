@@ -1,17 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
-using Xamarin.Forms;
-using Xamarin.Forms.Xaml;
-using System;
 using Xamarin.Forms;
 using Xamarin.Essentials;
-using System.Threading.Tasks;
-using System.Net.Sockets;
-using System.Net;
-using System.Text;
+
 
 namespace Remote_Control
 {
@@ -26,6 +17,7 @@ namespace Remote_Control
 
             buttons = new Button[] { btn1, btn2, btn3, btn4 };
 
+            enable_buttons(false);
 
             // Connection Events
             App.onEveryRun = () =>
@@ -52,7 +44,6 @@ namespace Remote_Control
 
             App.onWhileDisconnected = () =>
             {
-                enable_buttons(false);
             };
         }
 

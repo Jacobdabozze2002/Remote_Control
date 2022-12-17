@@ -2,26 +2,120 @@
 <ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="Remote_Control.MainPage"
-             BackgroundColor="black">
+             BackgroundColor="black"
+             Title=" Remote Controls">
 
-    
-    <StackLayout>
-        <Label
-            Margin="50"
-            Text="Remote Controls"
-            FontSize="Title"
-            TextColor="White"
-            HorizontalOptions="Center"/>
+    <ContentPage.Resources>
+        <Style TargetType="ScrollView">
+            <Setter Property="Orientation" Value="Vertical"/>
+        </Style>
 
-        <Button 
-            x:Name="open_LED_control"   
-            Text="LPC1768"
-            Clicked="open_LED_control_Clicked"
-            FontSize="Large"
-            BackgroundColor="White"
-            Margin="10"
-            CornerRadius="10"/>
-    </StackLayout>
+        <Style TargetType="FlexLayout" x:Key="parent">
+            <Setter Property="AlignItems" Value="Center"/>
+            <Setter Property="Wrap" Value="Wrap"/>
+            <Setter Property="JustifyContent" Value="SpaceBetween"/>
+            <Setter Property="AlignContent" Value="Center" />
+            <Setter Property="Margin" Value="10" />
+            <Setter Property="Padding" Value="0, 25, 0, 0" />
+        </Style>
 
+        <Style TargetType="FlexLayout">
+            <Setter Property="Direction" Value="Column" />
+            <Setter Property="AlignItems" Value="Center" />
+            <Setter Property="Padding" Value="5, 0, 5, 0" />
+        </Style>
+
+        <Style TargetType="Frame">
+            <Setter Property="FlexLayout.AlignSelf" Value="Center" />
+            <Setter Property="WidthRequest" Value="125" />
+            <Setter Property="HeightRequest" Value="200" />
+            <Setter Property="Margin" Value="0, 0, 0, 20" />
+            <Setter Property="BorderColor" Value="White" />
+            <Setter Property="BackgroundColor" Value="Black" />
+            <Setter Property="CornerRadius" Value="15" />
+        </Style>
+
+        <Style TargetType="Label">
+            <Setter Property="HorizontalTextAlignment" Value="Center"/>
+            <Setter Property="TextColor" Value="White" />
+            <Setter Property="FontSize" Value="Title" />
+            <Setter Property="Margin" Value="0, 0, 0, 25" />
+        </Style>
+
+        <Style TargetType="Image">
+            <Setter Property="FlexLayout.Grow" Value="1" />
+            <Setter Property="HeightRequest" Value="100" />
+        </Style>
+
+        <Style TargetType="Button">
+            <Setter Property="WidthRequest" Value="125" />
+            <Setter Property="HeightRequest" Value="40" />
+            <Setter Property="BackgroundColor" Value="Black" />
+            <Setter Property="BorderWidth" Value="1" />
+            <Setter Property="BorderColor" Value="White" />
+            <Setter Property="CornerRadius" Value="10" />
+            <Setter Property="TextColor" Value="White" />
+            <Setter Property="FontSize" Value="Body" />
+            <Setter Property="Text" Value="Connect" />
+            <Setter Property="Margin" Value="0, 25, 0, 0" />
+            <Setter Property="Padding" Value="0, 0, 0, 1" />
+        </Style>
+
+    </ContentPage.Resources>
+
+    <ScrollView>
+        <FlexLayout Style="{StaticResource parent}">
+
+            <Frame>
+                <FlexLayout>
+                    <Label Text="LPC1768" />
+                    <Image Source="lpc1768.png"/>
+                    <Button Clicked="open_LED_control_Clicked" />
+                </FlexLayout>
+            </Frame>
+
+            <Frame>
+                <FlexLayout>
+                    <Label Text="Unknown" />
+                    <Image Source="no_picture.png"/>
+                    <Button />
+                </FlexLayout>
+            </Frame>
+
+            <Frame>
+                <FlexLayout>
+                    <Label Text="Unknown" />
+                    <Image Source="no_picture.png"/>
+                    <Button />
+                </FlexLayout>
+            </Frame>
+
+            <Frame>
+                <FlexLayout>
+                    <Label Text="Unknown" />
+                    <Image Source="no_picture.png"/>
+                    <Button />
+                </FlexLayout>
+            </Frame>
+
+            <Frame>
+                <FlexLayout>
+                    <Label Text="Unknown" />
+                    <Image Source="no_picture.png"/>
+                    <Button />
+                </FlexLayout>
+            </Frame>
+
+            <Frame>
+                <FlexLayout>
+                    <Label Text="Unknown" />
+                    <Image Source="no_picture.png"/>
+                    <Button />
+                </FlexLayout>
+            </Frame>
+
+
+        </FlexLayout>
+    </ScrollView>
 
 </ContentPage>
