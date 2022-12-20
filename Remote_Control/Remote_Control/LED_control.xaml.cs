@@ -27,7 +27,7 @@ namespace Remote_Control
 
             App.onNewConnection = () =>
             {
-                _ = read_button_status();
+                read_button_status();
                 enable_buttons(true);
             };
 
@@ -39,7 +39,7 @@ namespace Remote_Control
 
             App.onWhileConnected = () =>
             {
-                _ = send_one_button_request();
+               send_one_button_request();
             };
 
             App.onWhileDisconnected = () =>
@@ -57,11 +57,10 @@ namespace Remote_Control
                     int i = Array.IndexOf(buttons, sender);
                     commands_buttons[i] = "000" + (i * 2 + 1);
                 });
-
             });
         }
 
-        private bool send_one_button_request()
+        private void send_one_button_request()
         {
             for (int i = 0; i < buttons.Length; ++i)
             {
@@ -76,13 +75,12 @@ namespace Remote_Control
                         buttons[i].Text = "LED " + i + " " + answer;
                         break;
                     }
-                    else return false;
+                    else return;
                 }
             }
-            return true;
         }
 
-        private bool read_button_status()
+        private void read_button_status()
         {
             string answer;
             string[] status = new string[buttons.Length];
@@ -92,11 +90,10 @@ namespace Remote_Control
                 answer = App.send_code("000" + (i * 2));
 
                 if (answer == "On" || answer == "Off") status[i] = answer;
-                else return false;
+                else return;
             }
 
             for (int i = 0; i < buttons.Length; ++i) buttons[i].Text = "LED " + i + " " + status[i];
-            return true;
         }
 
         private void reset_buttons() { for (int i = 0; i < buttons.Length; ++i) buttons[i].Text = "LED " + i + " Off"; }
@@ -118,6 +115,5 @@ namespace Remote_Control
         - "0006"    : LED 4 Status
         - "0007"    : LED 4 Toggle + Status
         - ...
-    - Antwort für Verbindungsanfrage: YYYY
     - Antwort für LED (Toggle): __ON oder _OFF
 */

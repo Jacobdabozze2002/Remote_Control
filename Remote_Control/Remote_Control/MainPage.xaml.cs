@@ -14,6 +14,23 @@ namespace Remote_Control
 
         private async void navigate_to(Page page, bool start_scheduler = true)
         {
+            // null -> Es besteht keine Netzverbindung
+            // Error
+            if (App.send_code("XXXX") == null)
+            {
+                await App.Current.MainPage.DisplayAlert("Bad Connection", "Check your connection settings.", "OK");
+                return;
+            }
+
+            // Spiegelantwort -> Server arbeitet bereits mit Client
+            // Error
+            if (start_scheduler && App.send_code("XXXX") == "XXXX")
+            {
+                await App.Current.MainPage.DisplayAlert("Request denied", "Another client has already connected to the server.\nPlease try again later.", "OK");
+                return;
+            }
+
+            // Seite öffnen und Scheduler starten
             await Navigation.PushAsync(page);
 
             if (start_scheduler)

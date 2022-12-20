@@ -10,8 +10,9 @@ namespace Remote_Control
 {
     public partial class App : Application
     {
-        private const int PORT = 80;
-        private const int TIMEOUT = 500;
+        private const int PORT = 12345;
+        private const int TIMEOUT_CONNECT = 500;
+        private const int TIMEOUT_SEND_RECEIVE = 350;
         private const string SERVER_IP = "192.168.0.100";
 
         public static bool IS_PAGE_OPEN = false;
@@ -35,7 +36,7 @@ namespace Remote_Control
         public static async void scheduler()
         {
             bool was_connected = false;
-
+            
             while (IS_PAGE_OPEN)
             {
                 // check connection status
@@ -60,11 +61,18 @@ namespace Remote_Control
                 }
 
                 // while connected
-                if (HAS_CONNECTION) onWhileConnected();
+                if (HAS_CONNECTION)
+                {
+                    onWhileConnected();
+                }
+                    
 
                 // while disconnected
-                if (!HAS_CONNECTION) onWhileDisconnected();
-
+                if (!HAS_CONNECTION)
+                {
+                    onWhileDisconnected();
+                }
+                    
 
                 // short delay
                 await Task.Delay(250);
@@ -81,19 +89,24 @@ namespace Remote_Control
                 IPAddress ip = IPAddress.Parse(SERVER_IP);
                 EndPoint endPoint = new IPEndPoint(ip, PORT);
                 Socket socket = new Socket(ip.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
-                socket.ReceiveTimeout = TIMEOUT;
-                socket.SendTimeout = TIMEOUT;
+                socket.ReceiveTimeout = TIMEOUT_SEND_RECEIVE;
+                socket.SendTimeout = TIMEOUT_SEND_RECEIVE;
 
-                Task connect = socket.ConnectAsync(endPoint);
-                if (connect.Wait(TIMEOUT))
+                // possibly retrying to connect
+                for (int i = 0; i < 5; ++i)
                 {
-                    byte[] message_sent = Encoding.ASCII.GetBytes(action_id);
-                    int bytes_sent = socket.Send(message_sent);
+                    if (socket.ConnectAsync(endPoint).Wait(TIMEOUT_CONNECT))
+                    {
+                        byte[] message_sent = Encoding.ASCII.GetBytes(action_id);
+                        _ = socket.Send(message_sent);
 
-                    byte[] message_received = new byte[4];
-                    int bytes_received = socket.Receive(message_received);
+                        byte[] message_received = new byte[4];
+                        _ = socket.Receive(message_received);
 
-                    answer = Encoding.ASCII.GetString(message_received, 0, 4);
+                        answer = Encoding.ASCII.GetString(message_received, 0, 4);
+
+                        break;
+                    }
                 }
 
                 socket.Close();
@@ -120,6 +133,9 @@ namespace Remote_Control
             {
                 // stop loop
                 IS_PAGE_OPEN = false;
+
+                // log off
+                for (int i = 0; i < 5; ++i) if (send_code("ZZZZ") == "WWWW") break;
 
                 // reset functions
                 onEveryRun = () => { };
