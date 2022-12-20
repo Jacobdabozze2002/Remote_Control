@@ -44,7 +44,7 @@
 
         <StackLayout VerticalOptions="Center">
             <Label  x:Name="lbConnect"
-                Text="Disconnected"/>
+                Text="Connecting ..."/>
 
             <Button x:Name="btn1"   
                 Text="LED 1 Off"
