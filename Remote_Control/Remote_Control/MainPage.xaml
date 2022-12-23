@@ -63,6 +63,7 @@
 
     </ContentPage.Resources>
 
+
     <ScrollView>
         <FlexLayout Style="{StaticResource parent}">
 
@@ -114,8 +115,8 @@
                 </FlexLayout>
             </Frame>
 
-
         </FlexLayout>
     </ScrollView>
 
+    
 </ContentPage>

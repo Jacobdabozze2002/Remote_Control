@@ -11,8 +11,7 @@ namespace Remote_Control
     public partial class App : Application
     {
         private const int PORT = 12345;
-        private const int TIMEOUT_CONNECT = 500;
-        private const int TIMEOUT_SEND_RECEIVE = 350;
+        private const int TIMEOUT = 500;
         private const string SERVER_IP = "192.168.0.100";
 
         public static bool IS_PAGE_OPEN = false;
@@ -35,81 +34,101 @@ namespace Remote_Control
 
         public static async void scheduler()
         {
-            bool was_connected = false;
-            
-            while (IS_PAGE_OPEN)
+            await Task.Run(async () =>
             {
-                // check connection status
-                HAS_NETWORK_ACCESS = Connectivity.NetworkAccess == NetworkAccess.Internet;
-                HAS_CONNECTION = HAS_NETWORK_ACCESS && send_code("XXXX") == "YYYY";
+                bool was_connected = false;
+                int fail_counter = 0;
 
-                // every run
-                onEveryRun();
-
-                // new connection
-                if (HAS_CONNECTION && !was_connected)
+                while (IS_PAGE_OPEN)
                 {
-                    onNewConnection();
-                    was_connected = true;
+                    // check connection status
+                    HAS_NETWORK_ACCESS = Connectivity.NetworkAccess == NetworkAccess.Internet;
+                    HAS_CONNECTION = HAS_NETWORK_ACCESS && send_code("XXXX") == "YYYY";
+
+                    // every run
+                    onEveryRun();
+
+                    // new connection
+                    if (HAS_CONNECTION && !was_connected)
+                    {
+                        onNewConnection();
+                        was_connected = true;
+                        fail_counter = 0;
+                    }
+
+                    // new disconnection
+                    if (!HAS_CONNECTION && was_connected)
+                    {
+                        onNewDisconnection();
+                        was_connected = false;
+                    }
+
+                    // while connected
+                    if (HAS_CONNECTION)
+                    {
+                        onWhileConnected();
+                    }
+
+                    // while disconnected
+                    if (!HAS_CONNECTION)
+                    {
+                        onWhileDisconnected();
+                        if (HAS_NETWORK_ACCESS) fail_counter++;
+                    }
+
+                    // kick - no connection
+                    if (fail_counter == 3)
+                    {
+                        MainThread.BeginInvokeOnMainThread(() =>
+                        {
+                            App.Current.MainPage.Navigation.PopAsync();
+                            App.Current.MainPage.DisplayAlert("Connection Error", "You couldn't connect to the server.", "OK");
+                        });
+                    }
+
+                    // short delay
+                    await Task.Delay(500);
                 }
-
-                // new disconnection
-                if (!HAS_CONNECTION && was_connected)
-                {
-                    onNewDisconnection();
-                    was_connected = false;
-                }
-
-                // while connected
-                if (HAS_CONNECTION)
-                {
-                    onWhileConnected();
-                }
-                    
-
-                // while disconnected
-                if (!HAS_CONNECTION)
-                {
-                    onWhileDisconnected();
-                }
-                    
-
-                // short delay
-                await Task.Delay(250);
-            }
-
+            });
         }
-
+        
         public static string send_code(string action_id)
         {
             string answer = null;
+            bool go_on = true;
 
             try
             {
-                IPAddress ip = IPAddress.Parse(SERVER_IP);
-                EndPoint endPoint = new IPEndPoint(ip, PORT);
-                Socket socket = new Socket(ip.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
-                socket.ReceiveTimeout = TIMEOUT_SEND_RECEIVE;
-                socket.SendTimeout = TIMEOUT_SEND_RECEIVE;
-
-                // possibly retrying to connect
-                for (int i = 0; i < 5; ++i)
+                for (int i = 0; i < (HAS_CONNECTION ? 5 : 2) && go_on; ++i)
                 {
-                    if (socket.ConnectAsync(endPoint).Wait(TIMEOUT_CONNECT))
+                    IPAddress ip = IPAddress.Parse(SERVER_IP);
+                    EndPoint endPoint = new IPEndPoint(ip, PORT);
+                    Socket socket = new Socket(ip.AddressFamily, SocketType.Stream, ProtocolType.Tcp);
+                    socket.ReceiveTimeout = TIMEOUT;
+                    socket.SendTimeout = TIMEOUT;
+                    socket.Blocking = true;
+
+                    try
                     {
+                        // CONNECT
+                        socket.Connect(endPoint);
+
+                        // SEND
                         byte[] message_sent = Encoding.ASCII.GetBytes(action_id);
                         _ = socket.Send(message_sent);
 
+                        // RECEIVE
                         byte[] message_received = new byte[4];
                         _ = socket.Receive(message_received);
 
                         answer = Encoding.ASCII.GetString(message_received, 0, 4);
 
-                        break;
+                        go_on = false;
                     }
-                }
+                    catch (Exception) {}
 
-                socket.Close();
+                    socket.Close();
+                }
 
                 return simplify(answer);
             }
@@ -129,13 +148,10 @@ namespace Remote_Control
 
         private void OnPageAppearing(object sender, Page e)
         {
-            if (e is MainPage)
+            if (e is MainPage && IS_PAGE_OPEN)
             {
                 // stop loop
                 IS_PAGE_OPEN = false;
-
-                // log off
-                for (int i = 0; i < 5; ++i) if (send_code("ZZZZ") == "WWWW") break;
 
                 // reset functions
                 onEveryRun = () => { };
@@ -150,12 +166,18 @@ namespace Remote_Control
         {
         }
 
-        protected override void OnSleep()
+        protected async override void OnSleep()
         {
+            if (IS_PAGE_OPEN)
+            {
+                await App.Current.MainPage.Navigation.PopAsync();
+                await App.Current.MainPage.DisplayAlert("Inactivity Error", "You have been disconnected due to inactivity.", "OK");
+            }
         }
 
         protected override void OnResume()
         {
+
         }
     }
 }

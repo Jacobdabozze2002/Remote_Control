@@ -22,12 +22,13 @@ namespace Remote_Control
             // Connection Events
             App.onEveryRun = () =>
             {
-                lbConnect.Text = App.HAS_NETWORK_ACCESS ? (App.HAS_CONNECTION ? "Connected" : "Connecting ...") : "Disconnected";
+
             };
 
             App.onNewConnection = () =>
             {
                 read_button_status();
+                set_label_text("Connected");
                 enable_buttons(true);
             };
 
@@ -44,20 +45,16 @@ namespace Remote_Control
 
             App.onWhileDisconnected = () =>
             {
+                set_label_text(App.HAS_NETWORK_ACCESS ? "Connecting ..." : "Disconnected");
             };
         }
 
-        private async void request_status_change(object sender, EventArgs e)
+        private void request_status_change(object sender, EventArgs e)
         {
-            await Task.Run(() =>
-            {
-                MainThread.BeginInvokeOnMainThread(() =>
-                {
-                    enable_buttons(false);
-                    int i = Array.IndexOf(buttons, sender);
-                    commands_buttons[i] = "000" + (i * 2 + 1);
-                });
-            });
+            enable_buttons(false);
+
+            int i = Array.IndexOf(buttons, sender);
+            commands_buttons[i] = "000" + (i * 2 + 1);
         }
 
         private void send_one_button_request()
@@ -72,7 +69,11 @@ namespace Remote_Control
 
                     if (answer == "On" || answer == "Off")
                     {
-                        buttons[i].Text = "LED " + i + " " + answer;
+                        MainThread.BeginInvokeOnMainThread(() =>
+                        {
+                            buttons[i].Text = "LED " + i + " " + answer;
+                        });
+
                         break;
                     }
                     else return;
@@ -93,12 +94,35 @@ namespace Remote_Control
                 else return;
             }
 
-            for (int i = 0; i < buttons.Length; ++i) buttons[i].Text = "LED " + i + " " + status[i];
+            MainThread.BeginInvokeOnMainThread(() => 
+            { 
+                for (int i = 0; i < buttons.Length; ++i) buttons[i].Text = "LED " + i + " " + status[i]; 
+            });
         }
 
-        private void reset_buttons() { for (int i = 0; i < buttons.Length; ++i) buttons[i].Text = "LED " + i + " Off"; }
+        private void reset_buttons() 
+        { 
+            MainThread.BeginInvokeOnMainThread(() =>
+            {
+                for (int i = 0; i < buttons.Length; ++i) buttons[i].Text = "LED " + i + " Off";
+            });
+        }
 
-        private void enable_buttons(bool enable) { foreach (Button button in buttons) button.IsEnabled = enable; }
+        private void enable_buttons(bool enable) 
+        {
+            MainThread.BeginInvokeOnMainThread(() =>
+            {
+                foreach (Button button in buttons) button.IsEnabled = enable;
+            });
+        }
+
+        private void set_label_text(string text)
+        {
+            MainThread.BeginInvokeOnMainThread(() =>
+            {
+                lbConnect.Text = text;
+            });
+        }
     }
 }
 
