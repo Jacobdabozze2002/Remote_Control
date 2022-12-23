@@ -2,7 +2,6 @@
 using Xamarin.Forms;
 using System.Threading.Tasks;
 
-
 namespace Remote_Control
 {
     public partial class MainPage : ContentPage
@@ -10,6 +9,18 @@ namespace Remote_Control
         public MainPage()
         {
             InitializeComponent();
+        }
+
+        public void openHint(string title = "Title", string message = "This is a message.")
+        {
+            hint_title.Text = title;
+            hint_message.Text = message;
+            popupView.IsVisible = true;
+        }
+
+        private void closeHint(object sender, EventArgs e)
+        {
+            popupView.IsVisible = false;
         }
 
         private async void navigate_to(Page page, bool start_scheduler = true)
@@ -22,7 +33,7 @@ namespace Remote_Control
 
                 if (answer == null)
                 {
-                    await DisplayAlert("Connection Error", "You couldn't connect to the server.", "OK");
+                    openHint("Connection Error", "The connection to the server failed.");
                     return;
                 };
             }
@@ -41,7 +52,6 @@ namespace Remote_Control
         {
             navigate_to(new LED_control());
         }
-
 
     }
 }

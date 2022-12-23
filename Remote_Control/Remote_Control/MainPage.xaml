@@ -3,7 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="Remote_Control.MainPage"
              BackgroundColor="black"
-             Title=" Remote Controls">
+             Title="Remote Controls">
 
     <ContentPage.Resources>
         <Style TargetType="ScrollView">
@@ -59,64 +59,80 @@
             <Setter Property="Text" Value="Connect" />
             <Setter Property="Margin" Value="0, 25, 0, 0" />
             <Setter Property="Padding" Value="0, 0, 0, 1" />
+            <Setter Property="TextTransform" Value="None" />
         </Style>
 
     </ContentPage.Resources>
 
 
-    <ScrollView>
-        <FlexLayout Style="{StaticResource parent}">
+    <AbsoluteLayout>
+        <ContentView AbsoluteLayout.LayoutFlags="All" AbsoluteLayout.LayoutBounds="0,0,1,1">
+            <ScrollView >
+                <FlexLayout Style="{StaticResource parent}">
 
-            <Frame>
-                <FlexLayout>
-                    <Label Text="LPC1768" />
-                    <Image Source="lpc1768.png"/>
-                    <Button Clicked="open_LED_control_Clicked" />
+                    <Frame>
+                        <FlexLayout>
+                            <Label Text="LPC1768" />
+                            <Image Source="lpc1768.png"/>
+                            <Button Clicked="open_LED_control_Clicked" />
+                        </FlexLayout>
+                    </Frame>
+
+                    <Frame>
+                        <FlexLayout>
+                            <Label Text="Unknown" />
+                            <Image Source="no_picture.png"/>
+                            <Button />
+                        </FlexLayout>
+                    </Frame>
+
+                    <Frame>
+                        <FlexLayout>
+                            <Label Text="Unknown" />
+                            <Image Source="no_picture.png"/>
+                            <Button />
+                        </FlexLayout>
+                    </Frame>
+
+                    <Frame>
+                        <FlexLayout>
+                            <Label Text="Unknown" />
+                            <Image Source="no_picture.png"/>
+                            <Button />
+                        </FlexLayout>
+                    </Frame>
+
+                    <Frame>
+                        <FlexLayout>
+                            <Label Text="Unknown" />
+                            <Image Source="no_picture.png"/>
+                            <Button />
+                        </FlexLayout>
+                    </Frame>
+
+                    <Frame>
+                        <FlexLayout>
+                            <Label Text="Unknown" />
+                            <Image Source="no_picture.png"/>
+                            <Button />
+                        </FlexLayout>
+                    </Frame>
+
                 </FlexLayout>
-            </Frame>
+            </ScrollView>
+        </ContentView>
 
-            <Frame>
+
+        <ContentView x:Name="popupView" IsVisible="false" BackgroundColor="#E0101010" AbsoluteLayout.LayoutBounds="0, 0, 1, 1" AbsoluteLayout.LayoutFlags="All">
+            <StackLayout VerticalOptions="Center" HorizontalOptions="Center">
                 <FlexLayout>
-                    <Label Text="Unknown" />
-                    <Image Source="no_picture.png"/>
-                    <Button />
+                    <Label x:Name="hint_title" Text="Connection Failed" FontSize="40"/>
+                    <Label x:Name="hint_message" FontSize="Medium" LineBreakMode="WordWrap" Text="The connection failed due to reasons XYZ. asd a sdasd asdasdasd asd asd asdas das dasd asdasdasdasdasdasdasdasdad"/>
+                    <Button Text="OK" BackgroundColor="#D5101010" Clicked="closeHint"/>
                 </FlexLayout>
-            </Frame>
-
-            <Frame>
-                <FlexLayout>
-                    <Label Text="Unknown" />
-                    <Image Source="no_picture.png"/>
-                    <Button />
-                </FlexLayout>
-            </Frame>
-
-            <Frame>
-                <FlexLayout>
-                    <Label Text="Unknown" />
-                    <Image Source="no_picture.png"/>
-                    <Button />
-                </FlexLayout>
-            </Frame>
-
-            <Frame>
-                <FlexLayout>
-                    <Label Text="Unknown" />
-                    <Image Source="no_picture.png"/>
-                    <Button />
-                </FlexLayout>
-            </Frame>
-
-            <Frame>
-                <FlexLayout>
-                    <Label Text="Unknown" />
-                    <Image Source="no_picture.png"/>
-                    <Button />
-                </FlexLayout>
-            </Frame>
-
-        </FlexLayout>
-    </ScrollView>
-
+            </StackLayout>
+        </ContentView>
+        
+    </AbsoluteLayout>
     
 </ContentPage>

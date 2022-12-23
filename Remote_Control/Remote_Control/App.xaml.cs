@@ -24,12 +24,15 @@ namespace Remote_Control
         public static Action onWhileConnected = () => { };
         public static Action onWhileDisconnected = () => { };
 
+        private static MainPage mainPage;
+
         public App()
         {
             InitializeComponent();
 
             Current.PageAppearing += OnPageAppearing;
-            MainPage = new NavigationPage(new MainPage());
+            mainPage = new MainPage();
+            MainPage = new NavigationPage(mainPage);
         }
 
         public static async void scheduler()
@@ -77,12 +80,12 @@ namespace Remote_Control
                     }
 
                     // kick - no connection
-                    if (fail_counter == 3)
+                    if (fail_counter >= 3)
                     {
                         MainThread.BeginInvokeOnMainThread(() =>
                         {
+                            mainPage.openHint("Reconnection Error", "The connection to the Server could not be reastablished.");
                             App.Current.MainPage.Navigation.PopAsync();
-                            App.Current.MainPage.DisplayAlert("Connection Error", "You couldn't connect to the server.", "OK");
                         });
                     }
 
@@ -171,7 +174,7 @@ namespace Remote_Control
             if (IS_PAGE_OPEN)
             {
                 await App.Current.MainPage.Navigation.PopAsync();
-                await App.Current.MainPage.DisplayAlert("Inactivity Error", "You have been disconnected due to inactivity.", "OK");
+                mainPage.openHint("Inactivity Error", "You have been moved to the Main Page due to inactivity.");
             }
         }
 
