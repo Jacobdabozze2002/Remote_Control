@@ -10,6 +10,31 @@ namespace Remote_Control
 {
     public partial class App : Application
     {
+        private class Timer
+        {
+            public bool active = false;
+            public Action action = () => { };
+
+            public void run(int count_to)
+            {
+                Task.Run(async () =>
+                {
+                    int counter = 0;
+                    active = true;
+
+                    while (active && counter < count_to)
+                    {
+                        await Task.Delay(1000);
+                        if (active) ++counter;
+                    }
+
+                    if (counter >= count_to) action();
+                });
+            }
+        }
+        private Timer timer = new Timer();
+        private const int INACTIVE_AFTER = 5;
+
         private const int PORT = 12345;
         private const int TIMEOUT = 500;
         private const string SERVER_IP = "192.168.0.100";
@@ -33,6 +58,15 @@ namespace Remote_Control
             Current.PageAppearing += OnPageAppearing;
             mainPage = new MainPage();
             MainPage = new NavigationPage(mainPage);
+
+            timer.action = () =>
+            {
+                MainThread.BeginInvokeOnMainThread(() =>
+                {
+                    Current.MainPage.Navigation.PopAsync();
+                    mainPage.openHint("Inactivity", "You have been moved to the Main Page due to inactivity");
+                });
+            };
         }
 
         public static async void scheduler()
@@ -84,8 +118,8 @@ namespace Remote_Control
                     {
                         MainThread.BeginInvokeOnMainThread(() =>
                         {
-                            mainPage.openHint("Reconnection Error", "The connection to the Server could not be reastablished.");
-                            App.Current.MainPage.Navigation.PopAsync();
+                            Current.MainPage.Navigation.PopAsync();
+                            mainPage.openHint("Failed to Reconnect", "The connection to the Server could not be reastablished.");
                         });
                     }
 
@@ -169,18 +203,14 @@ namespace Remote_Control
         {
         }
 
-        protected async override void OnSleep()
+        protected override void OnSleep()
         {
-            if (IS_PAGE_OPEN)
-            {
-                await App.Current.MainPage.Navigation.PopAsync();
-                mainPage.openHint("Inactivity Error", "You have been moved to the Main Page due to inactivity.");
-            }
+            if (IS_PAGE_OPEN) timer.run(INACTIVE_AFTER);       
         }
 
         protected override void OnResume()
         {
-
+            timer.active = false;
         }
     }
 }
