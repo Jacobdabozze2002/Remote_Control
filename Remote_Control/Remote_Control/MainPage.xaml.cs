@@ -33,7 +33,7 @@ namespace Remote_Control
 
                 if (answer == null)
                 {
-                    openHint("Connection Failed", "The connection to the server failed.");
+                    openHint("Connection Failed", "The connection to the server failed.\nPlease try again later.");
                     return;
                 };
             }

@@ -51,6 +51,7 @@ namespace Remote_Control
 
         private static MainPage mainPage;
 
+        [Obsolete]
         public App()
         {
             InitializeComponent();
@@ -59,12 +60,14 @@ namespace Remote_Control
             mainPage = new MainPage();
             MainPage = new NavigationPage(mainPage);
 
+            NavigationPage.SetTitleIcon(this, "lpc1768.png");
+
             timer.action = () =>
             {
                 MainThread.BeginInvokeOnMainThread(() =>
                 {
                     Current.MainPage.Navigation.PopAsync();
-                    mainPage.openHint("Inactivity", "You have been moved to the Main Page due to inactivity");
+                    mainPage.openHint("Inactivity", "You have been moved to the Main Page due to inactivity.");
                 });
             };
         }

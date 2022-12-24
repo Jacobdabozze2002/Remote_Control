@@ -2,8 +2,11 @@
 <ContentPage xmlns="http://xamarin.com/schemas/2014/forms"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="Remote_Control.MainPage"
-             BackgroundColor="black"
-             Title="Remote Controls">
+             BackgroundColor="Black">
+
+    <NavigationPage.TitleView>
+        <Image Source="hsmw_logo.png" Margin="0, -16, 0, 0" HorizontalOptions="Center" VerticalOptions="Center"/>
+    </NavigationPage.TitleView>
 
     <ContentPage.Resources>
         <Style TargetType="ScrollView">
@@ -64,7 +67,10 @@
 
     </ContentPage.Resources>
 
-
+    <Shell.TitleView>
+        <Image Source="lpc1768.png"/>
+    </Shell.TitleView>
+    
     <AbsoluteLayout>
         <ContentView AbsoluteLayout.LayoutFlags="All" AbsoluteLayout.LayoutBounds="0,0,1,1">
             <ScrollView >
@@ -126,9 +132,9 @@
         <ContentView x:Name="popupView" IsVisible="false" BackgroundColor="#E0101010" AbsoluteLayout.LayoutBounds="0, 0, 1, 1" AbsoluteLayout.LayoutFlags="All">
             <StackLayout VerticalOptions="Center" HorizontalOptions="Center">
                 <FlexLayout>
-                    <Label x:Name="hint_title" Text="Connection Failed" FontSize="40"/>
-                    <Label x:Name="hint_message" FontSize="Medium" LineBreakMode="WordWrap" Text="The connection failed due to reasons XYZ. asd a sdasd asdasdasd asd asd asdas das dasd asdasdasdasdasdasdasdasdad"/>
-                    <Button Text="OK" BackgroundColor="#D5101010" Clicked="closeHint"/>
+                    <Label x:Name="hint_title" Text="Error" FontSize="40"/>
+                    <Label Padding="25, 0, 25, 0" x:Name="hint_message" FontSize="Medium" LineBreakMode="WordWrap" Text="Description."/>
+                    <Button Text="OK" BackgroundColor="#00000000" Clicked="closeHint"/>
                 </FlexLayout>
             </StackLayout>
         </ContentView>
